@@ -40,16 +40,16 @@ public class ChangedTable implements Serializable {
 	@JsonProperty("Lsn")
 	private String lsn;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	@JsonProperty("TranEndTimeUTC")
-	private Date tranEndTimeUTC;
+	private String tranEndTimeUTC;
 
 	public ChangedTable() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	public ChangedTable(String schemaName, String changedTableName, int numberOfRows, int batches, String lsn,
-			Date tranEndTimeUTC) {
+			String tranEndTimeUTC) {
 		super();
 		this.schemaName = schemaName;
 		this.changedTableName = changedTableName;
@@ -88,16 +88,16 @@ public class ChangedTable implements Serializable {
 	public void setLsn(String lsn) {
 		this.lsn = lsn;
 	}
-	public Date getTranEndTimeUTC() {
+	public String getTranEndTimeUTC() {
 		return tranEndTimeUTC;
 	}
-	public void setTranEndTimeUTC(Date tranEndTimeUTC) {
+	public void setTranEndTimeUTC(String tranEndTimeUTC) {
 		this.tranEndTimeUTC = tranEndTimeUTC;
 	}
 	@Override
 	public String toString() {
-		return "ChangedTable [schemaName=" + schemaName + ", changedTableName=" + changedTableName + ", numberOfRows="
-				+ numberOfRows + ", batches=" + batches + ", lsn=" + lsn + ", tranEndTimeUTC=" + tranEndTimeUTC + "]";
+		return "{\"schemaName\":\"" + schemaName + "\",\"changedTableName\":\"" + changedTableName + "\",\"numberOfRows\":"
+				+ numberOfRows + ",\"batches\":" + batches + ",\"lsn\":\"" + lsn + "\",\"tranEndTimeUTC\":\"" + tranEndTimeUTC + "\"}";
 	}
 
 }

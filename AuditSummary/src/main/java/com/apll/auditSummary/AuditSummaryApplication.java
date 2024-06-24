@@ -3,12 +3,15 @@ package com.apll.auditSummary;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 @EnableKafka
+@EnableScheduling
 public class AuditSummaryApplication {
 
 	@Autowired
@@ -31,29 +35,29 @@ public class AuditSummaryApplication {
 		SpringApplication.run(AuditSummaryApplication.class, args);
 	}
 
-	@PostConstruct
+	@Scheduled(fixedRate = 30,timeUnit = TimeUnit.SECONDS)
 	public void getSummaryData() throws IOException, InterruptedException, ExecutionException {
-//		ExchangeFilterFunction basicAuthenticationFilter = ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-//			ClientRequest newRequest = ClientRequest.from(clientRequest).headers(headers -> {
-//				headers.add("Cookie", "WEBSVC=58b7de25b1e11abb");
-//				headers.setBasicAuth("A0P.Audit.API.APLL", "AHPeD5rp8eN2Xj9Eqq*3rH");
-//			}).build();
-//			return Mono.just(newRequest);
-//		});
-//
-//		String afterLsn = AppUtils.readStringFromFile();
-//		System.out.println(" Start LSN "+afterLsn);
-//		WebClient client = WebClient.builder().baseUrl("https://svc-a0ptrn.wisegrid.net")
-//				.filter(basicAuthenticationFilter).build();
-//
-//		
-//		
-//		  List<ChangedTable> changedTables = client.get() .uri(uriBuilder ->
-//		  uriBuilder.path("/Services/api/analytics/audit-data-summary")
-//		  .queryParam("response_format", "JSON").queryParam("after_lsn",
-//		  afterLsn).build()).accept(MediaType.APPLICATION_JSON).retrieve()
-//		  .bodyToFlux(ChangedTable.class).collectList().block();
-//		 
+		ExchangeFilterFunction basicAuthenticationFilter = ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+			ClientRequest newRequest = ClientRequest.from(clientRequest).headers(headers -> {
+				headers.add("Cookie", "WEBSVC=58b7de25b1e11abb");
+				headers.setBasicAuth("A0P.Audit.API.APLL", "AHPeD5rp8eN2Xj9Eqq*3rH");
+			}).build();
+			return Mono.just(newRequest);
+		});
+
+		String afterLsn = AppUtils.readStringFromFile();
+		System.out.println(" Start LSN "+afterLsn);
+		WebClient client = WebClient.builder().baseUrl("https://svc-a0ptrn.wisegrid.net")
+				.filter(basicAuthenticationFilter).build();
+
+		
+		
+		  List<ChangedTable> changedTables = client.get() .uri(uriBuilder ->
+		  uriBuilder.path("/Services/api/analytics/audit-data-summary")
+		  .queryParam("response_format", "JSON").queryParam("after_lsn",
+		  afterLsn).build()).accept(MediaType.APPLICATION_JSON).retrieve()
+		  .bodyToFlux(ChangedTable.class).collectList().block();
+		 
 //		 
 //		
 //		/*
@@ -67,7 +71,11 @@ public class AuditSummaryApplication {
 //		 */
 //		 
 //		 
-		kafkaPublisher.sendMessage(null);
+		  
+		  for (ChangedTable changedTable : changedTables) {
+			System.out.println(changedTable.toString());
+		}
+		kafkaPublisher.sendMessage(changedTables);
 
 	}
 }

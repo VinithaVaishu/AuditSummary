@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import com.apll.auditSummary.config.CustomPartitionConfig;
 import com.apll.auditSummary.util.AppUtils;
 
+import lombok.Synchronized;
+
 @Service
 public class KafkaPublisher {
 
@@ -30,17 +32,14 @@ public class KafkaPublisher {
 	private CustomPartitionConfig partitionconfig;
 
 	public void sendMessage(List<ChangedTable> list) throws InterruptedException, ExecutionException, IOException {
-//		for (ChangedTable changedTable : list) {
-//			template.send("com.apll.cargowise.summary", changedTable.getChangedTableName(), changedTable.toString());
-//		System.out.println(changedTable.toString());
-//		}
+
 		Long start = System.nanoTime();
-		template.send("com.apll.cargowise.summary", "Tablename_key", "Value");
-//		Long count =list.stream().map(
-//				table -> template.send("com.apll.cargowise.summary", table.getChangedTableName(), table.toString()))
-//				.count();
- // System.out.println(count);
-		 
+	
+	list.stream().map(
+				table -> publish(table))
+				.forEach(t-> System.out.println(t));
+  
+		// publish(list.get(0));
 		String afterLsn =null;
 		if(list.size()!=0) {
 			afterLsn = list.get(list.size()-1).getLsn();
@@ -55,6 +54,13 @@ public class KafkaPublisher {
 		Long endTime = System.nanoTime();
 		System.out.println(endTime - start);// 587001//1164400
 
+	}
+
+	private String publish(ChangedTable table) {
+		
+		CompletableFuture<SendResult<String, String>> result = template.send("com.apll.cargowise.summary", table.getChangedTableName(), table.toString());
+		
+		return result.toString();
 	}
 
 }

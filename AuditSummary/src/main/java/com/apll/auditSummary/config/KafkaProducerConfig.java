@@ -28,7 +28,8 @@ public class KafkaProducerConfig {
 	        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 	        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
 	        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-	        configProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitionConfig.class);
+	        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG,1000);
+	      //  configProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitionConfig.class);
 	        return new DefaultKafkaProducerFactory<>(configProps);
 	    }
 	    
