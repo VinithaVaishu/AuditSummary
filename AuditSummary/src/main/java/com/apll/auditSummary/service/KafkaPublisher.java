@@ -35,14 +35,14 @@ public class KafkaPublisher {
 
 		Long start = System.nanoTime();
 	
-	list.stream().map(
-				table -> publish(table))
-				.forEach(t-> System.out.println(t));
+//	list.stream().map(
+//				table -> publish(table))
+//				.forEach(t-> System.out.println(t));
   
-		// publish(list.get(0));
+	  publish(list.get(0));
 		String afterLsn =null;
 		if(list.size()!=0) {
-			afterLsn = list.get(list.size()-1).getLsn();
+			afterLsn = list.get(0).getLsn();
 			System.out.println("No of records processed " + list.size() + "  " + "Last LSN = " + afterLsn);
 
 			AppUtils.writingGivenStringToFile(afterLsn);

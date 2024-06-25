@@ -35,7 +35,7 @@ public class AuditSummaryApplication {
 		SpringApplication.run(AuditSummaryApplication.class, args);
 	}
 
-	@Scheduled(fixedRate = 30,timeUnit = TimeUnit.SECONDS)
+	@Scheduled(fixedRate = 15,timeUnit = TimeUnit.SECONDS)
 	public void getSummaryData() throws IOException, InterruptedException, ExecutionException {
 		ExchangeFilterFunction basicAuthenticationFilter = ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
 			ClientRequest newRequest = ClientRequest.from(clientRequest).headers(headers -> {
