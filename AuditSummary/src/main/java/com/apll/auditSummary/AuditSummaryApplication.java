@@ -69,12 +69,6 @@ public class AuditSummaryApplication {
 //		 * .accept(MediaType.APPLICATION_JSON).retrieve().bodyToFlux(ChangedTable.class)
 //		 * .collectList().block();
 //		 */
-//		 
-//		 
-		  
-		  for (ChangedTable changedTable : changedTables) {
-			System.out.println(changedTable.toString());
-		}
 		kafkaPublisher.sendMessage(changedTables);
 
 	}
