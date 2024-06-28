@@ -1,4 +1,4 @@
-package com.apll.auditSummary.service;
+package com.apll.cdcsummary.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,7 +23,7 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChangedTable implements Serializable {
+public class CDCSummaryResponse implements Serializable {
 
 	@JsonProperty("SchemaName")
 	private String schemaName;
@@ -44,11 +44,11 @@ public class ChangedTable implements Serializable {
 	@JsonProperty("TranEndTimeUTC")
 	private String tranEndTimeUTC;
 
-	public ChangedTable() {
+	public CDCSummaryResponse() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public ChangedTable(String schemaName, String changedTableName, int numberOfRows, int batches, String lsn,
+	public CDCSummaryResponse(String schemaName, String changedTableName, int numberOfRows, int batches, String lsn,
 			String tranEndTimeUTC) {
 		super();
 		this.schemaName = schemaName;

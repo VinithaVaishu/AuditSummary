@@ -1,4 +1,4 @@
-package com.apll.auditSummary.util;
+package com.apll.cdcsummary.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

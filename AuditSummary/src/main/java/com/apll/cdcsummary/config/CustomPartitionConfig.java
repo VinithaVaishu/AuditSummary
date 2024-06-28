@@ -1,4 +1,4 @@
-package com.apll.auditSummary.config;
+package com.apll.cdcsummary.config;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.apll.auditSummary.service;
+package com.apll.cdcsummary.service;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -15,8 +15,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
-import com.apll.auditSummary.config.CustomPartitionConfig;
-import com.apll.auditSummary.util.AppUtils;
+import com.apll.cdcsummary.config.CustomPartitionConfig;
+import com.apll.cdcsummary.model.CDCSummaryResponse;
+import com.apll.cdcsummary.util.AppUtils;
 
 import lombok.Synchronized;
 
@@ -26,23 +27,23 @@ public class KafkaPublisher {
 	@Autowired
 	private KafkaTemplate<String, String> template;
 
-	@Value("${kafka.topic}")
+	@Value("${kafka_topic}")
 	private String summaryTopic;
 	
 	private CustomPartitionConfig partitionconfig;
 
-	public void sendMessage(List<ChangedTable> list) throws InterruptedException, ExecutionException, IOException {
+	public void sendMessage(List<CDCSummaryResponse> list) throws InterruptedException, ExecutionException, IOException {
 
 		Long start = System.nanoTime();
 	
-//	list.stream().map(
-//				table -> publish(table))
-//				.forEach(t-> System.out.println(t));
+	list.stream().map(
+				cdcResponse -> publish(cdcResponse))
+				.collect(Collectors.toList());
   
-	  publish(list.get(0));
+	 // publish(list.get(0));
 		String afterLsn =null;
 		if(list.size()!=0) {
-			afterLsn = list.get(0).getLsn();
+			afterLsn = list.get(list.size()-1).getLsn();
 			System.out.println("No of records processed " + list.size() + "  " + "Last LSN = " + afterLsn);
 
 			AppUtils.writingGivenStringToFile(afterLsn);
@@ -56,10 +57,8 @@ public class KafkaPublisher {
 
 	}
 
-	private String publish(ChangedTable table) {
-		
-		CompletableFuture<SendResult<String, String>> result = template.send("com.apll.cargowise.summary", table.getChangedTableName(), table.toString());
-		
+	private String publish(CDCSummaryResponse cdcResponse) {
+		CompletableFuture<SendResult<String, String>> result = template.send(summaryTopic, cdcResponse.getChangedTableName(), cdcResponse.toString());
 		return result.toString();
 	}
 
