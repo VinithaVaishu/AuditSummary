@@ -58,7 +58,7 @@ public class KafkaPublisher {
 	}
 
 	private String publish(CDCSummaryResponse cdcResponse) {
-		CompletableFuture<SendResult<String, String>> result = template.send(summaryTopic, cdcResponse.getChangedTableName(), cdcResponse.toString());
+		CompletableFuture<SendResult<String, String>> result = template.send("cdr-detail-topic-01", cdcResponse.getChangedTableName(), cdcResponse.toString());
 		return result.toString();
 	}
 

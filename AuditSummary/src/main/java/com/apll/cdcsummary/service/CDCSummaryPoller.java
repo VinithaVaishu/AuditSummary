@@ -24,8 +24,10 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.*;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 public class CDCSummaryPoller {
 
