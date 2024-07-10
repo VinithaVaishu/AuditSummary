@@ -20,8 +20,10 @@ import com.apll.cdcsummary.model.CDCSummaryResponse;
 import com.apll.cdcsummary.util.AppUtils;
 
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class KafkaPublisher {
 
 	@Autowired
@@ -29,36 +31,34 @@ public class KafkaPublisher {
 
 	@Value("${kafka_topic}")
 	private String summaryTopic;
-	
+
 	private CustomPartitionConfig partitionconfig;
 
-	public void sendMessage(List<CDCSummaryResponse> list) throws InterruptedException, ExecutionException, IOException {
-
-		Long start = System.nanoTime();
-	
-	list.stream().map(
-				cdcResponse -> publish(cdcResponse))
-				.collect(Collectors.toList());
-  
-	 // publish(list.get(0));
-		String afterLsn =null;
-		if(list.size()!=0) {
-			afterLsn = list.get(list.size()-1).getLsn();
-			System.out.println("No of records processed " + list.size() + "  " + "Last LSN = " + afterLsn);
+	public void sendMessage(List<CDCSummaryResponse> list)
+			throws InterruptedException, ExecutionException, IOException {
+		log.info("Processing of Summary records has started");
+		Long start = System.currentTimeMillis();
+		List<String> result = list.stream().map(cdcResponse -> publish(cdcResponse)).collect(Collectors.toList());
+		// publish(list.get(0));
+		String afterLsn = null;
+		if (list.size() != 0) {
+			afterLsn = list.get(list.size() - 1).getLsn();
+			log.info("No of records processed " + list.size() + "  " + "Last LSN = " + afterLsn);
 
 			AppUtils.writingGivenStringToFile(afterLsn);
-		}else {
-			System.out.println("No of records processed " + list.size() );
+		} else {
+			log.info("No of records processed " + list.size());
 		}
-		
 
-		Long endTime = System.nanoTime();
-		System.out.println(endTime - start);// 587001//1164400
+		Long endTime = System.currentTimeMillis();
+		log.debug("Time taken to process the summary records"+(endTime - start));// 587001//1164400
+		log.info("Processing of Summary records has ended");
 
 	}
 
 	private String publish(CDCSummaryResponse cdcResponse) {
-		CompletableFuture<SendResult<String, String>> result = template.send("cdr-detail-topic-01", cdcResponse.getChangedTableName(), cdcResponse.toString());
+		CompletableFuture<SendResult<String, String>> result = template.send("cdr-summary-topic-01",
+				cdcResponse.getChangedTableName(), cdcResponse.toString());
 		return result.toString();
 	}
 

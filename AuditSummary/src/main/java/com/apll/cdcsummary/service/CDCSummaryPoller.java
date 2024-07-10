@@ -47,6 +47,7 @@ public class CDCSummaryPoller {
 
 	@Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS)
 	public void getSummaryData() throws IOException, InterruptedException, ExecutionException {
+		log.info("Summary poller has started");
 		ExchangeFilterFunction basicAuthenticationFilter = ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
 			ClientRequest newRequest = ClientRequest.from(clientRequest).headers(headers -> {
 				headers.setBasicAuth(username, password);
@@ -55,16 +56,17 @@ public class CDCSummaryPoller {
 		});
 
 		String afterLsn = AppUtils.readStringFromFile();
-		System.out.println(" Start LSN " + afterLsn);
+		log.info("Last LSN from previoud poll :"+ afterLsn);
 		WebClient client = WebClient.builder().baseUrl(baseurl).filter(basicAuthenticationFilter).build();
-
+		log.info("Polling of Cargowise summary API started");
 		List<CDCSummaryResponse> cdcResponseList = client.get()
 				.uri(uriBuilder -> uriBuilder.path(path).queryParam(AppConstants.responseFormat, responseFormat)
 						.queryParam(AppConstants.after_lsn, afterLsn).build())
 				.accept(MediaType.APPLICATION_JSON).retrieve().bodyToFlux(CDCSummaryResponse.class).collectList()
 				.block();
 
-		 
+		log.info("Polling of Cargowise summary API ended");
+		log.info("No of records polled from current polling : "+ cdcResponseList.size());
 		
 		/*// Poll summary response with date range
 		 * List<ChangedTable> changedTables = client.get() .uri(uriBuilder ->
